@@ -63,7 +63,7 @@ export DATASET_MONITOR_TEXT="since 09/2013"
   export DATASET_MONITOR_FILE=DatasetSummaryAll
 root -q -b -l $MONITOR_BASE/plotDatasets.C\("$average",$interval\)
 
-# exit -1
+exit -1
 
 start=$(date --date=01/01/2014 +%s)
 end=$(date --date=$(date +"%m/%d/%Y") +%s)
