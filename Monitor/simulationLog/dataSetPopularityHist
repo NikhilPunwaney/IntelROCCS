@@ -4,27 +4,28 @@ import os,sys
 import ROOT
 
 ## Retrieving AnalysisOps files
-##openfile = open(os.environ.get('DETOX_DB')+"status/DatasetsInPhedexAtSites.dat")
-#openfile = open("log/IntelROCCS/Detox/status/DatasetsInPhedexAtSites.dat")
-#running_datasets = [i.split() for i in openfile.readlines()]
-#AnalysisOps_dict = {}
-#for i in running_datasets:
-#    if i[1] == 'AnalysisOps' and i[5][:2] == "T2":
-#	if i[0] in AnalysisOps_dict:
-#        	AnalysisOps_dict[i[0]].append(i[5])
-#	else:
-#		AnalysisOps_dict[i[0]] = [i[5]]
+#openfile = open(os.environ.get('DETOX_DB')+"status/DatasetsInPhedexAtSites.dat")
+openfile = open("log/IntelROCCS/Detox/status/DatasetsInPhedexAtSites.dat")
+running_datasets = [i.split() for i in openfile.readlines()]
+AnalysisOps_dict = {}
+dataset_sizes = {}
+for i in running_datasets:
+    if i[1] == 'AnalysisOps' and i[5][:2] == "T2":
+	if i[0] in AnalysisOps_dict:
+        	AnalysisOps_dict[i[0]].append(i[5])
+		dataset_sizes[i[0]] += float(i[2])
+	else:
+		AnalysisOps_dict[i[0]] = [i[5]]
+		dataset_sizes[i[0]] = float(i[2])
 
-exec('simulationLog/test_1.py')
 
-AnalysisOps_dict = yes_AnalOps
-yes_EmpSpa = yes_EmpSpa
+execfile('history.py')
 
-AnalysisOps_files = [i for i in AnalysisOps_dict]
+popularities = data_date05
 
-sitesPerData = {}
-for i in AnalysisOps_dict:
-    sitesPerData[i] = len(AnalysisOps_dict[i])
+AnalysisOps_files = [i for i in popularities]
+
+sitesPerData = site_date05
 
 ##openfile2 = open(os.environ.get('MONITOR_DB')+"/DatasetSummaryAll.txt")
 openfile2 = open("log/IntelROCCS/Monitor/DatasetSummaryAll.txt")
@@ -32,6 +33,9 @@ all_datasets = [i.split() for i in openfile2.readlines()]
 
 ## Here is the unsorted sample
 unsorted_sample = [i for i in all_datasets if i[5] in AnalysisOps_files]
+
+for i in unsorted_sample:
+	i[2] = popularities[i[5]]
 
 ## First possibility: ranking by highest current average popularity
 sorted_sample_bymaxcurrent = []
@@ -41,13 +45,13 @@ sorted_sample_bymaxchange = []
 ## Defining average popularity
 def average_pop(x):
     try:
-        return float(x[2])/(float(sitesPerData[x[5]])*float(x[3]))
+        return float(x[2])/(float(len(sitesPerData[x[5]]))*float(x[3]))
     except ZeroDivisionError:
         print x
         sys.exit(-1)
 ## Defining change in average popularity
 def pop_change(x):
-    return float(x[2])/(float(sitesPerData[x[5]])*float(x[3])) - float(x[2])/((float(x[0])+1)*float(x[3]))
+    return float(x[2])/(float(len(sitesPerData[x[5]]))*float(x[3])) - float(x[2])/((float(x[0])+1)*float(x[3]))
 
 ## Adding base entry
 sorted_sample_bymaxcurrent.append((unsorted_sample[0], average_pop(unsorted_sample[0])))

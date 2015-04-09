@@ -3,7 +3,7 @@
 import os,sys
 
 ## Retrieving waitTimes files
-execfile("runWaitTimes.py")
+execfile("runWaitTimesHist.py")
 site_averageTime = site_averageTime
 site_emptySpace = site_emptySpace
 site_totalSpace = site_totalSpace
@@ -24,7 +24,7 @@ def sort_sites(a, x, lo = 0, hi = None):
     a.insert(lo, (x, site_averageTime[x], site_emptySpace[x], site_totalSpace[x]))
 
 ## Populating our lists    
-for i in site_averageTime:
+for i in site_totalSpace:
     if i != 'T2_AT_Vienna':
         sort_sites(sorted_sample_byminscore, i, lo = 0, hi = None)
     else:
@@ -156,20 +156,20 @@ for i in range(row*column):#(row * column - 1):
             pass
     canvas2.cd()
     globals()[graphhh_list[i]].Draw("same")
-    canvas2.SaveAs("Graphs2.png")
+    canvas2.SaveAs("Graphs2Hist.png")
     canvas1.cd()
     globals()[graphh_list[i]].Draw("same")
-    canvas1.SaveAs("Graphs1.png")
+    canvas1.SaveAs("Graphs1Hist.png")
     canvas.cd()
     globals()[graph_list[i]].Draw("same")
-    canvas.SaveAs("Graphs.png")
+    canvas.SaveAs("GraphsHist.png")
 
 canvas2.cd()
-canvas2.SaveAs("Graphs2.png")
+canvas2.SaveAs("Graphs2Hist.png")
 canvas1.cd()
-canvas1.SaveAs("Graphs1.png")
+canvas1.SaveAs("Graphs1Hist.png")
 canvas.cd()
-canvas.SaveAs("Graphs.png")
+canvas.SaveAs("GraphsHist.png")
 
 print str(count_Sites) + ' data sets were duplicated across ' + str(len(duplicate_sites)) + ' different sites!'
 
@@ -178,11 +178,11 @@ print str(count_Sites) + ' data sets were duplicated across ' + str(len(duplicat
 import os
 import time
 
-os.system("touch test_2.txt")
+os.system("touch test_1_Hist.txt")
 
 localtime = time.asctime( time.localtime(time.time()) )
 
-with open("test_2.txt", "a") as mfile:
+with open("test_1_Hist.txt", "a") as mfile:
 	mfile.write("date_time = ")
         mfile.write(str(localtime))
 	mfile.write("\n")
@@ -195,4 +195,4 @@ with open("test_2.txt", "a") as mfile:
         mfile.write("yes_EmpSpa = ")
         mfile.write(str(site_emptySpace))
 
-os.system("mv test_2.txt test_2.py")
+os.system("mv test_1_Hist.txt test_1_Hist.py")

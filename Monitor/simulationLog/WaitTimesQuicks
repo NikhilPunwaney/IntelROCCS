@@ -140,6 +140,7 @@ logFilePath = os.environ.get('MONITOR_DB') + "/waitTimes/%i_%i.log"%(timeStartSt
 
 pid = os.getpid()
 jsonExists = os.path.isfile(outFilePath)
+
 if jsonExists:
     waitTimes, compressedList, maxWait = processFile(outFilePath)
 else:
@@ -159,6 +160,7 @@ else:
     curlPath = curlPath.replace("@","%")
     # print "curl -H 'Accept: application/json' '%s' "%(curlPath)
     os.system("mkdir -p tmp")
+    #print "curl -H 'Accept: application/json' '%s' > tmp/%i.json"%(curlPath,pid)
     os.system("curl -H 'Accept: application/json' '%s' > tmp/%i.json"%(curlPath,pid))
     # os.system("curl -H 'Accept: application/json' '%s'| python -mjson.tool > tmp/%i.json"%(curlPath,pid))
     waitTimes, compressedList, maxWait = processFileJson("tmp/%i.json"%(pid))
@@ -166,7 +168,7 @@ else:
 
 formatString = ["%i ", "%s ", "%s ", "%i ", "%i ", "%i ", "%i "]
 
-with open("output.txt", "a") as myfile:
+with open("outputHist.txt", "a") as myfile:
     myfile.write(str(waitTimes))
 
 # sys.stdout.write(str(maxWait[0])+"\n")

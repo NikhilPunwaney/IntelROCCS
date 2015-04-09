@@ -1,0 +1,84 @@
+#!/usr/bin/python
+
+import os,sys
+import ROOT
+
+## Retrieving AnalysisOps files
+##openfile = open(os.environ.get('DETOX_DB')+"status/DatasetsInPhedexAtSites.dat")
+#openfile = open("log/IntelROCCS/Detox/status/DatasetsInPhedexAtSites.dat")
+#running_datasets = [i.split() for i in openfile.readlines()]
+#AnalysisOps_dict = {}
+#for i in running_datasets:
+#    if i[1] == 'AnalysisOps' and i[5][:2] == "T2":
+#	if i[0] in AnalysisOps_dict:
+#        	AnalysisOps_dict[i[0]].append(i[5])
+#	else:
+#		AnalysisOps_dict[i[0]] = [i[5]]
+
+execfile('test_6_60.py')
+
+AnalysisOps_dict = yes_AnalOps
+yes_EmpSpa = yes_EmpSpa
+
+AnalysisOps_files = [i for i in AnalysisOps_dict]
+
+sitesPerData = {}
+for i in AnalysisOps_dict:
+    sitesPerData[i] = len(AnalysisOps_dict[i])
+
+##openfile2 = open(os.environ.get('MONITOR_DB')+"/DatasetSummaryAll.txt")
+openfile2 = open("log/IntelROCCS/Monitor/DatasetSummaryAll.txt")
+all_datasets = [i.split() for i in openfile2.readlines()]
+
+## Here is the unsorted sample
+unsorted_sample = [i for i in all_datasets if i[5] in AnalysisOps_files]
+
+## First possibility: ranking by highest current average popularity
+sorted_sample_bymaxcurrent = []
+## Second possibility: ranking by greatest change in average popularity if copied to another site
+sorted_sample_bymaxchange = []
+
+## Defining average popularity
+def average_pop(x):
+    try:
+        return float(x[2])/(float(sitesPerData[x[5]])*float(x[3]))
+    except ZeroDivisionError:
+        print x
+        sys.exit(-1)
+## Defining change in average popularity
+def pop_change(x):
+    return float(x[2])/(float(sitesPerData[x[5]])*float(x[3])) - float(x[2])/((float(x[0])+1)*float(x[3]))
+
+## Adding base entry
+sorted_sample_bymaxcurrent.append((unsorted_sample[0], average_pop(unsorted_sample[0])))
+sorted_sample_bymaxchange.append((unsorted_sample[0], pop_change(unsorted_sample[0])))
+
+## Defining sorting entry for first possibility
+def sort_it_1(a, x, lo = 0, hi = None):
+    if lo < 0:
+        raise ValueError('lo must be non-negative')
+    if hi is None:
+        hi = len(a)
+    while lo < hi:
+        mid = (lo+hi)//2
+        if average_pop(x) < a[mid][1]: hi = mid
+        else: lo = mid+1
+    a.insert(lo, (x, average_pop(x)))
+## Defining sorting entry for second possibility
+def sort_it_2(a, x, lo = 0, hi = None):
+    if lo < 0:
+        raise ValueError('lo must be non-negative')
+    if hi is None:
+        hi = len(a)
+    while lo < hi:
+        mid = (lo+hi)//2
+        if pop_change(x) < a[mid][1]: hi = mid
+        else: lo = mid+1
+    a.insert(lo, (x, pop_change(x)))
+
+## Populating our lists    
+for i in unsorted_sample[1:]:
+    sort_it_1(sorted_sample_bymaxcurrent, i, lo = 0, hi = None)
+    sort_it_2(sorted_sample_bymaxchange, i, lo = 0, hi = None)
+######
+
